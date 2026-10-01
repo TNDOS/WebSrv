@@ -74,8 +74,13 @@
 
     var dl = el('div', 'dl');
 
-    // 源码归档（永远存在，由 GitHub 自动生成）
-    dl.appendChild(link(archive(comp.repo, 'tags', v.tag, 'zip'), 'primary', '源码 .zip'));
+    // Releases 页面放第一个，而且是主按钮。
+    // 成品二进制是人工传到那里的，所以"下载"这件事的入口就是它 ——
+    // 页面不假装自己能猜出附件名。
+    dl.appendChild(link(releasePage(comp.repo, v.tag), 'primary', '下载 / Releases'));
+
+    // 源码归档：永远存在，GitHub 按 tag 自动生成，不受 API 限流影响
+    dl.appendChild(link(archive(comp.repo, 'tags', v.tag, 'zip'), '', '源码 .zip'));
     dl.appendChild(link(archive(comp.repo, 'tags', v.tag, 'tar.gz'), '', '源码 .tar.gz'));
 
     // Release 附件（内核 / 构建产物）—— 只在清单里写了才渲染，
@@ -91,7 +96,6 @@
       }
     }
 
-    dl.appendChild(link(releasePage(comp.repo, v.tag), '', 'Release &#8599;'));
     row.appendChild(dl);
 
     return row;

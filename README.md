@@ -1,4 +1,4 @@
-# TNDOS 官网 / demo-repository
+# TNDOS 官网 / WebSrv
 
 TNDDOS 的下载与介绍页。**纯静态**，没有构建步骤，没有依赖 —— 直接推到 GitHub Pages 就能用。
 

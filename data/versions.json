@@ -1,21 +1,28 @@
 {
   "generated": "2026-10-01",
   "owner": "TNDOS",
-  "site": "github.com/TNDOS/demo-repository",
+  "site": "github.com/TNDOS/WebSrv",
   "components": [
     {
       "id": "syscore",
       "repo": "TNDOS-SysCore",
       "zh": "内核 / 系统核心",
       "en": "Kernel and SysCore",
-      "desc_zh": "引导链、TNX 加载器、内核、Shell。这是操作系统本体。",
-      "desc_en": "Boot chain, TNX loader, kernel, shell. The operating system itself.",
+      "desc_zh": "引导链、TNX 加载器、内核、Shell。这是操作系统本体。成品二进制（磁盘映像、内核映像）在每个版本的 Releases 页面上。",
+      "desc_en": "Boot chain, TNX loader, kernel, shell. Built binaries are attached to each release.",
       "versions": [
+        {
+          "tag": "v0.3.2",
+          "date": "2026-10-01",
+          "sha": "HEAD",
+          "latest": true,
+          "subject_zh": "控制台换行翻译、API v2.x（颜色 / 光标 / 文件 / 目录）、外部命令、TNX 程序",
+          "subject_en": "Console newline handling; API v2.x (colours, cursor, file and directory I/O); external commands"
+        },
         {
           "tag": "v0.3.1-M3",
           "date": "2026-09-29",
           "sha": "f03a53a",
-          "latest": true,
           "subject_zh": "TNX 加载器 + 裸程序名执行；工具链拆到独立仓库",
           "subject_en": "TNX loader; run programs by bare name; toolchain split out"
         },
@@ -49,7 +56,7 @@
           "date": "2026-09-29",
           "sha": "176f995",
           "latest": true,
-          "subject_zh": "自包含 SDK：API v2.x、printf、文件/目录 API、驱动运行时",
+          "subject_zh": "自包含 SDK：API v2.x、printf、文件 / 目录 API、驱动运行时",
           "subject_en": "Self-contained SDK: API v2.x, printf, file/dir API, driver runtime"
         }
       ]
