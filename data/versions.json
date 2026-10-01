@@ -1,0 +1,94 @@
+{
+  "generated": "2026-10-01",
+  "owner": "TNDOS",
+  "site": "github.com/TNDOS/demo-repository",
+  "components": [
+    {
+      "id": "syscore",
+      "repo": "TNDOS-SysCore",
+      "zh": "内核 / 系统核心",
+      "en": "Kernel and SysCore",
+      "desc_zh": "引导链、TNX 加载器、内核、Shell。这是操作系统本体。",
+      "desc_en": "Boot chain, TNX loader, kernel, shell. The operating system itself.",
+      "versions": [
+        {
+          "tag": "v0.3.1-M3",
+          "date": "2026-09-29",
+          "sha": "f03a53a",
+          "latest": true,
+          "subject_zh": "TNX 加载器 + 裸程序名执行；工具链拆到独立仓库",
+          "subject_en": "TNX loader; run programs by bare name; toolchain split out"
+        },
+        {
+          "tag": "v0.3.0",
+          "date": "2026-09-17",
+          "sha": "455a3bb",
+          "subject_zh": "提交初始代码",
+          "subject_en": "Initial code"
+        },
+        {
+          "tag": "Pre-1",
+          "date": "2026-09-17",
+          "sha": "455a3bb",
+          "pre": true,
+          "subject_zh": "早期快照（与 v0.3.0 同一提交）",
+          "subject_en": "Early snapshot (same commit as v0.3.0)"
+        }
+      ]
+    },
+    {
+      "id": "sdk",
+      "repo": "TNDOS-SDK",
+      "zh": "程序开发包 / SDK",
+      "en": "SDK",
+      "desc_zh": "写 TNX 程序和驱动需要的头文件、运行时、链接脚本、样例。不需要内核源码。",
+      "desc_en": "Headers, runtime, linker script and examples for writing TNX programs and drivers.",
+      "versions": [
+        {
+          "tag": "v1.0",
+          "date": "2026-09-29",
+          "sha": "176f995",
+          "latest": true,
+          "subject_zh": "自包含 SDK：API v2.x、printf、文件/目录 API、驱动运行时",
+          "subject_en": "Self-contained SDK: API v2.x, printf, file/dir API, driver runtime"
+        }
+      ]
+    },
+    {
+      "id": "toolskit",
+      "repo": "TNDOS-ToolsKit",
+      "zh": "构建工具 / Build tools",
+      "en": "Build tools",
+      "desc_zh": "宿主机工具：tnxpack（ELF64 转 TNX）、tnxdump（检查器）、mkfat（FAT16 映像）。",
+      "desc_en": "Host tools: tnxpack, tnxdump, mkfat.",
+      "versions": [
+        {
+          "tag": "v1.0",
+          "date": "2026-09-29",
+          "sha": "a32086f",
+          "latest": true,
+          "subject_zh": "tnxpack / tnxdump / mkfat",
+          "subject_en": "tnxpack / tnxdump / mkfat"
+        }
+      ]
+    },
+    {
+      "id": "sysapp",
+      "repo": "TNDOS-SysAPP",
+      "zh": "系统应用 / External commands",
+      "en": "System apps",
+      "desc_zh": "外部命令：EXECOM、MORE、FIND、FC、TREE、ATTRIB、EDIT。每个都是 TNX 程序。",
+      "desc_en": "External commands, each a TNX program.",
+      "versions": [
+        {
+          "tag": "v1.0",
+          "date": "2026-10-01",
+          "sha": "568f81f",
+          "latest": true,
+          "subject_zh": "七个外部命令，含 EXECOM 与全屏 EDIT",
+          "subject_en": "Seven external commands including EXECOM and a full-screen EDIT"
+        }
+      ]
+    }
+  ]
+}
