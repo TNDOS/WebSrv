@@ -12,10 +12,24 @@
       "desc_en": "Boot chain, TNX loader, kernel, shell. Built binaries are attached to each release.",
       "versions": [
         {
+          "tag": "v0.3.2-M4-SP1",
+          "date": "2026-10-08",
+          "sha": "32a1c98",
+          "latest": true,
+          "subject_zh": "中文上屏；控制台服务层与自有 framebuffer 后端；API v2.4 批量原语；定时器",
+          "subject_en": "Chinese on screen; console service layer with a framebuffer backend; API v2.4 batch primitives; timer"
+        },
+        {
+          "tag": "v0.3.2-M4-SP0",
+          "date": "2026-10-03",
+          "sha": "ac22eea",
+          "subject_zh": "控制台服务层 + 自有 framebuffer 后端；内嵌 8x12 点阵字体",
+          "subject_en": "Console service layer and an own framebuffer backend; embedded 8x12 bitmap font"
+        },
+        {
           "tag": "v0.3.2",
           "date": "2026-10-01",
-          "sha": "HEAD",
-          "latest": true,
+          "sha": "f21f4c6",
           "subject_zh": "控制台换行翻译、API v2.x（颜色 / 光标 / 文件 / 目录）、外部命令、TNX 程序",
           "subject_en": "Console newline handling; API v2.x (colours, cursor, file and directory I/O); external commands"
         },
