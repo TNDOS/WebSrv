@@ -91,6 +91,57 @@
   </section>
 
   <section>
+    <h2><span lang="zh">为什么不直接用 UEFI Shell</span><span lang="en">Why not just use the UEFI Shell</span></h2>
+    <p>
+      <span lang="zh">UEFI Shell 已经能加载 PE、有文件系统、有命令行、有脚本。所以这个问题必须正面回答。</span>
+      <span lang="en">The UEFI Shell already loads PE images and has a filesystem, a command line and scripts. So the question deserves a straight answer.</span>
+    </p>
+
+    <h3><span lang="zh">一、它脱离不了固件</span><span lang="en">1. It cannot leave the firmware</span></h3>
+    <p>
+      <span lang="zh">UEFI Shell 是固件的一部分。调了 <code>ExitBootServices</code> 之后它自己也消失了 ——
+      它没办法「把自己接过来」。TNDDOS 的精力恰恰花在这里：把显示、字体、键盘、文件系统一块一块接过去，
+      直到不再依赖固件。</span>
+      <span lang="en">The UEFI Shell is part of the firmware. Run <code>ExitBootServices</code> and the shell disappears along
+      with it -- it cannot take itself over. That is exactly where TNDDOS spends its effort: taking display, font, keyboard and
+      filesystem over one piece at a time, until the firmware is no longer needed.</span>
+    </p>
+
+    <h3><span lang="zh">二、PE 有藏身处</span><span lang="en">2. PE has places to hide</span></h3>
+    <p>
+      <span lang="zh">PE 的段之间、文件末尾存在大量对齐空洞（KB 到 MB 级）。CIH 就是这么干的：
+      把载荷写进空洞、改入口点、<b>文件大小不变</b> —— 于是结构校验全部通过。熊猫烧香一类是同一个路子。</span>
+      <span lang="en">PE images carry a great deal of alignment slack, both between sections and at the end of the file
+      (kilobytes to megabytes). CIH worked exactly this way: write the payload into the slack, repoint the entry point, and
+      <b>leave the file size untouched</b>, so every structural check passes. The Panda Burning Incense family used the same
+      route.</span>
+    </p>
+    <p>
+      <span lang="zh"><b>TNX 段与段之间最多 15 个字节的 16 字节对齐填充 —— 没有 KB 级的藏身处。</b></span>
+      <span lang="en"><b>TNX allows at most 15 bytes of 16-byte alignment padding between sections -- there is no
+      kilobyte-scale hiding place.</b></span>
+    </p>
+    <p class="note">
+      <span lang="zh">但要说清楚：<b>这不等于免疫。</b><code>EntryRVA</code> 就在头里，改它一样容易；
+      而 TNX v1.1 没有任何校验（<code>Checksum</code> 被砍了，<code>SIGN</code> 只记录不验证）——
+      「被改了」这件事<b>现在查不出来</b>。所以 TNX 眼下的优势是「没地方藏」，不是「藏了能发现」。
+      <br><br>
+      真正能兑现这个承诺的是两条设计承诺：一是<b>每个字节都要有主</b>（对齐填充必须为零，加载器检查），
+      文件里没有「没人管」的地方，「被插入」必然落在规范描述过的位置上；二是
+      <b><code>SIGN</code> 段的位置已经留好了</b> —— 现在只记录不验证，将来加验证器不用改格式。</span>
+      <span lang="en">But be precise about this: <b>it is not immunity.</b> <code>EntryRVA</code> sits in the header and is
+      just as easy to repoint, and TNX v1.1 performs no verification at all (<code>Checksum</code> was cut, and
+      <code>SIGN</code> is recorded but never checked) -- so <b>a modified file cannot currently be detected</b>. TNX's
+      present advantage is that there is nowhere to hide, not that hiding would be noticed.
+      <br><br>
+      Two design commitments are what would actually deliver that promise. First, <b>every byte has an owner</b>: alignment
+      padding must be zero and the loader checks it, so there is no unclaimed space and any insertion lands somewhere the
+      specification describes. Second, <b>the <code>SIGN</code> section already has its place</b> -- recorded but unverified
+      today, so a verifier can be added later without changing the format.</span>
+    </p>
+  </section>
+
+  <section>
     <h2><span lang="zh">做了什么</span><span lang="en">What</span></h2>
     <div class="cards">
       <div class="card">
