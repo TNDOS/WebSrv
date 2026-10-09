@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>下载 —— TNDDOS</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html">TNDDOS</a>
+    <nav>
+      <a href="index.html"><span lang="zh">主页</span><span lang="en">Home</span></a>
+      <a href="download.html"><span lang="zh">下载</span><span lang="en">Download</span></a>
+      <a href="https://github.com/TNDOS/TNDOS-SysCore"><span lang="zh">源码</span><span lang="en">Source</span></a>
+      <a href="https://github.com/TNDOS/WebSrv/issues"><span lang="zh">联系我们</span><span lang="en">Contact</span></a>
+    </nav>
+    <button id="lang" class="lang" type="button">EN</button>
+  </div>
+</header>
+<main class="wrap">
+
+  <section style="margin-top:2.5rem">
+    <h1 style="font-size:1.8rem"><span lang="zh">下载</span><span lang="en">Download</span></h1>
+    <p>
+      <span lang="zh">所有源码都在 GitHub 上。下面是各组件的最新版本和归档链接 ——
+      <b>成品二进制</b>（磁盘映像、内核映像）挂在对应版本的 Releases 页面上。</span>
+      <span lang="en">All source lives on GitHub. Below are the components with their latest versions and archive links.
+      <strong>Built binaries</strong> (disk images, kernel images) are attached to each release.</span>
+    </p>
+    <p class="note">
+      <span lang="zh">这个页面不依赖 GitHub API —— 它读的是仓库里的 <code>data/versions.json</code>。</span>
+      <span lang="en">This page does not use the GitHub API; it reads <code>data/versions.json</code> from the repository.</span>
+    </p>
+  </section>
+
+  <section>
+    <div id="components" class="components"></div>
+  </section>
+
+  <section>
+    <h2><span lang="zh">从源码构建</span><span lang="en">Building from source</span></h2>
+    <div class="code"><span lang="zh">需要 LLVM（clang + ld.lld）和 QEMU。构建和启动一条命令：</span><span lang="en">You need LLVM (clang and ld.lld) and QEMU. Build and boot in one command:</span>
+
+  tools\build-run.ps1
+
+<span lang="zh">只要构建不启动：</span><span lang="en">Build without booting:</span>
+
+  tools\build-run.ps1 -NoRun</div>
+    <p class="note">
+      <span lang="zh">工具链路径用环境变量指：<code>TNDDOS_LLVM_BIN</code>、<code>TNDDOS_QEMU</code>、
+      <code>TNDDOS_SDK</code>、<code>TNDDOS_SYSAPP</code>、<code>TNDDOS_TOOLKIT</code>。</span>
+      <span lang="en">Point at your toolchain with environment variables: <code>TNDDOS_LLVM_BIN</code>,
+      <code>TNDDOS_QEMU</code>, <code>TNDDOS_SDK</code>, <code>TNDDOS_SYSAPP</code>, <code>TNDDOS_TOOLKIT</code>.</span>
+    </p>
+  </section>
+
+</main>
+<footer>
+  <div class="wrap">
+    <div>
+      <span lang="zh">TNDDOS / 2NDDOS —— UEFI 时代的 DOS。源码在 <a href="https://github.com/TNDOS">github.com/TNDOS</a>。</span>
+      <span lang="en">TNDDOS / 2NDDOS, a DOS for the UEFI era. Source at <a href="https://github.com/TNDOS">github.com/TNDOS</a>.</span>
+    </div>
+    <div>
+      <a href="https://github.com/TNDOS/TNDOS-SysCore"><span lang="zh">源码</span><span lang="en">Source</span></a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/TNDOS/WebSrv/issues"><span lang="zh">联系我们</span><span lang="en">Contact</span></a>
+    </div>
+  </div>
+</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

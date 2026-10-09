@@ -1,129 +1,190 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-Hans" data-lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TNDDOS — 为 UEFI 时代重新定义的 DOS</title>
-<meta name="description" content="TNDDOS (2NDDOS)：保留 DOS 的交互模型，丢掉 DOS 的内存模型。UEFI x86-64，自有 TNX 可执行格式。">
+<title>TNDDOS —— UEFI 时代的 DOS</title>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-
-<header class="hero">
-  <div class="wrap">
-    <div class="banner">
-      <span class="prompt">C:\&gt;</span> <span class="typed">TNDDOS</span><span class="caret">_</span>
-    </div>
-    <h1>TNDDOS <span class="dim">/ 2NDDOS</span></h1>
-    <p class="tagline">
-      一个为 UEFI 时代重新定义的 DOS<br>
-      <span class="en">Keep DOS's interaction model. Drop DOS's memory model.</span>
-    </p>
-    <p class="lede">
-      固定段、一次一个程序、没有保护 —— 有意为之。<br>
-      但没有 640K 上限、没有 himem、没有 XMS、没有 EMM386、没有常规内存。
-    </p>
-    <p class="lede en">
-      Fixed segments, one program at a time, no protection — on purpose.
-      No 640K barrier, no himem, no XMS, no EMM386, no conventional memory.
-    </p>
-    <div class="badges">
-      <span class="badge">UEFI x86-64</span>
-      <span class="badge">No BIOS / No 16-bit</span>
-      <span class="badge">TNX executable format</span>
-      <span class="badge">Version 0.3.2</span>
-      <span class="badge">Ring 0, no paging</span>
-    </div>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html">TNDDOS</a>
+    <nav>
+      <a href="index.html"><span lang="zh">主页</span><span lang="en">Home</span></a>
+      <a href="download.html"><span lang="zh">下载</span><span lang="en">Download</span></a>
+      <a href="https://github.com/TNDOS/TNDOS-SysCore"><span lang="zh">源码</span><span lang="en">Source</span></a>
+      <a href="https://github.com/TNDOS/WebSrv/issues"><span lang="zh">联系我们</span><span lang="en">Contact</span></a>
+    </nav>
+    <button id="lang" class="lang" type="button">EN</button>
   </div>
 </header>
+<div class="hero">
+  <div class="wrap">
+    <div class="banner"><span class="prompt">C:\&gt;</span> <span class="typed">TNDDOS</span> <span class="caret">_</span></div>
+    <h1>TNDDOS</h1>
+    <p class="tagline">
+      <span lang="zh">2ND DOS —— 一个从头写的、跑在 UEFI 上的 DOS。</span>
+      <span lang="en">2ND DOS -- a DOS written from scratch, running on UEFI.</span>
+    </p>
+    <blockquote>
+      <span lang="zh"><strong>不是把传统 DOS 搬到 UEFI，而是重新做一个 UEFI 时代的 DOS。</strong><br>
+      保留 DOS 的交互模型（简单、直接、命令行优先、<code>C:\</code> 盘符），
+      丢掉它的内存模型与历史包袱（16 位、BIOS、640KB、DOS ABI）。</span>
+      <span lang="en"><strong>Not DOS ported onto UEFI -- a DOS for the UEFI era, written anew.</strong><br>
+      We keep DOS's interaction model (simple, direct, command line first, a <code>C:\</code> drive letter)
+      and drop its memory model and historical baggage (16-bit, BIOS, 640KB, the DOS ABI).</span>
+    </blockquote>
+    <div class="badges">
+      <span class="badge">x86-64</span>
+      <span class="badge">UEFI</span>
+      <span class="badge">TNX v1.1</span>
+      <span class="badge">API v2.4</span>
+      <span class="badge">single-tasking</span>
+      <span class="badge">ring 0</span>
+    </div>
+  </div>
+</div>
 
 <main class="wrap">
 
-  <section id="downloads">
-    <h2>下载 <span class="dim en">Downloads</span></h2>
-    <p class="note" id="generated"></p>
-    <div id="components" class="components">
-      <p class="loading">正在读取版本清单 ...</p>
+  <img class="shot" src="assets/screen.png" alt="TNDDOS console running hello.tnx at 160x50, showing Chinese glyph alignment and the API self-test">
+  <p class="shot-cap">
+    <span lang="zh">自有的 framebuffer 后端，160x50 网格。倒数几行的 <code>[wide]</code> 是中文对齐自检 ——
+    <code>|A中B文C|</code> 三条竖线要对得上，错了就是半角 / 全角的格子宽度算错了。</span>
+    <span lang="en">Our own framebuffer backend on a 160x50 grid. The <code>[wide]</code> lines near the bottom are the
+    CJK alignment self-test: the three bars in <code>|A中B文C|</code> have to line up, otherwise the half-width and
+    full-width cell maths is wrong.</span>
+  </p>
+
+  <section>
+    <h2><span lang="zh">为什么做这个</span><span lang="en">Why</span></h2>
+
+    <h3><span lang="zh">DOS 的交互模型没过时</span><span lang="en">DOS's interaction model is not obsolete</span></h3>
+    <p>
+      <span lang="zh">命令行、直接、不藏东西。你需要什么就打什么，出错就说清楚错在哪。
+      这套东西在 1981 年好用，现在也好用 —— 过时的是它的<b>内存模型</b>，不是它的<b>用法</b>。</span>
+      <span lang="en">A command line, direct, hiding nothing. You type what you need and it tells you plainly when
+      something fails. It worked in 1981 and it works now. What aged badly was <b>the memory model</b>, not the
+      <b>way you use it</b>.</span>
+    </p>
+
+    <h3><span lang="zh">UEFI 给了我们一个不用碰 BIOS 的起点</span><span lang="en">UEFI gives us a starting point that avoids BIOS entirely</span></h3>
+    <p>
+      <span lang="zh">写一个操作系统最难的不是内核，是<b>到内核为止的那段路</b>：实模式、A20、GDT、自己写磁盘和键盘驱动。
+      UEFI 把这一段替我们做了 —— 文件系统、磁盘、键盘、显示，开局就能用。
+      我们<b>不着急切断它</b>，而是先把每一块慢慢接过来。</span>
+      <span lang="en">The hard part of an OS is not the kernel, it is <b>the road leading to it</b>: real mode, A20, the GDT,
+      hand-written disk and keyboard drivers. UEFI does that part for us -- filesystem, disk, keyboard and display work
+      from the first instruction. We are in <b>no hurry to cut it off</b>; instead we take each piece over, one at a time.</span>
+    </p>
+
+    <h3><span lang="zh">反目标：不做成 PE 的复刻</span><span lang="en">Anti-goal: not a PE look-alike</span></h3>
+    <p>
+      <span lang="zh">这不是一个"要替代 Windows"的项目，也不是"重造一个 PE 加载器"的项目。
+      自制可执行格式 <a href="https://github.com/TNDOS/TNDOS-SysCore/blob/main/docs/TNX-SPEC.md">TNX</a> 存在的理由很硬：
+      <b>当我们不能再调固件的 <code>LoadImage</code> 的时候，我们还能加载程序。</b></span>
+      <span lang="en">This is not a project to replace Windows, nor to rebuild a PE loader. Our executable format,
+      <a href="https://github.com/TNDOS/TNDOS-SysCore/blob/main/docs/TNX-SPEC.md">TNX</a>, exists for one hard reason:
+      <b>when we can no longer call the firmware's <code>LoadImage</code>, we can still load a program.</b></span>
+    </p>
+  </section>
+
+  <section>
+    <h2><span lang="zh">做了什么</span><span lang="en">What</span></h2>
+    <div class="cards">
+      <div class="card">
+        <h4><span lang="zh">引导链</span><span lang="en">Boot chain</span></h4>
+        <p><span lang="zh">BOOTX64.EFI → kernel.efi → Shell → <code>autoexec.bat</code>。<code>efidos.sys</code> / <code>config.sys</code> 提供设置项与环境变量。</span>
+        <span lang="en">BOOTX64.EFI to kernel.efi to the shell to <code>autoexec.bat</code>, with <code>efidos.sys</code> / <code>config.sys</code> for settings and environment variables.</span></p>
+      </div>
+      <div class="card">
+        <h4><span lang="zh">TNX 可执行格式</span><span lang="en">The TNX executable format</span></h4>
+        <p><span lang="zh">固定基址、无重定位、无导入表。加载器是「一次 memcpy 加一个跳转」。
+        规范已到 v1.1，带架构标识。</span>
+        <span lang="en">Fixed base address, no relocations, no imports. The loader is one memcpy and a jump.
+        The specification is at v1.1 and carries an architecture id.</span></p>
+      </div>
+      <div class="card">
+        <h4><span lang="zh">控制台是自己的</span><span lang="en">The console is ours</span></h4>
+        <p><span lang="zh">控制台服务层加可换后端：固件 ConOut 一个，自己往帧缓冲写像素的一个。
+        <code>CONSOLE fb</code> / <code>CONSOLE uefi</code> 随时切。</span>
+        <span lang="en">A console service layer with swappable backends: the firmware's ConOut, and one that writes
+        its own pixels into the framebuffer. Switch any time with <code>CONSOLE fb</code> / <code>CONSOLE uefi</code>.</span></p>
+      </div>
+      <div class="card">
+        <h4><span lang="zh">中文能上屏</span><span lang="en">Chinese on screen</span></h4>
+        <p><span lang="zh">自己光栅化、自己加载、自己渲染。21,427 个字形，8x16 半角 / 16x16 全角，
+        统一格子高度 16。字体生成器也在仓库里。</span>
+        <span lang="en">Rasterised, loaded and rendered by us. 21,427 glyphs, 8x16 half-width and 16x16 full-width
+        on one uniform cell height of 16. The font generator ships with the repository.</span></p>
+      </div>
+      <div class="card">
+        <h4><span lang="zh">API v2.4</span><span lang="en">API v2.4</span></h4>
+        <p><span lang="zh">文件、目录、颜色、光标，以及批量原语（<code>write_cells</code> / <code>fill</code> /
+        <code>scroll</code> / <code>screen</code>）。最后那组是性能底线，不是高级功能。</span>
+        <span lang="en">Files, directories, colours, cursor, plus batch primitives (<code>write_cells</code>,
+        <code>fill</code>, <code>scroll</code>, <code>screen</code>). That last group is a performance floor,
+        not a luxury feature.</span></p>
+      </div>
+      <div class="card">
+        <h4><span lang="zh">定时器</span><span lang="en">A timer</span></h4>
+        <p><span lang="zh"><code>ticks()</code> 返回自启动以来的毫秒。读 TSC，用固件的 <code>Stall</code> 校频。
+        <b>不需要 IDT</b> —— 读时基不是等中断。可在配置文件里关掉。</span>
+        <span lang="en"><code>ticks()</code> returns milliseconds since boot, reading the TSC and calibrating against
+        the firmware's <code>Stall</code>. <strong>No IDT required</strong> -- reading a time base is not waiting for an
+        interrupt. It can be switched off in the configuration files.</span></p>
+      </div>
     </div>
   </section>
 
   <section>
-    <h2>每个版本都能下载 <span class="dim en">Every version stays downloadable</span></h2>
-    <p>
-      GitHub 对每个 tag 都会自动生成源码归档，URL 是确定性的，因此<strong>历史版本一直都在</strong>。
-      这个页面只是把它变成一眼能看到的东西。
-    </p>
-    <pre class="code">https://github.com/TNDOS/&lt;仓库&gt;/archive/refs/tags/&lt;版本&gt;.tar.gz
-https://github.com/TNDOS/&lt;仓库&gt;/archive/refs/tags/&lt;版本&gt;.zip</pre>
+    <h2><span lang="zh">诚实的现状</span><span lang="en">An honest status</span></h2>
     <p class="note">
-      源码归档由 GitHub 按 tag 自动生成，不需要任何构建，也不受 API 限流影响。
-      <strong>成品二进制（磁盘映像、内核映像）由维护者人工传到对应版本的 Releases 页面</strong>，
-      所以每个版本的「下载 / Releases」按钮才是拿成品的地方。
+      <span lang="zh">这些不是免责声明，是"会让你白折腾"的东西。</span>
+      <span lang="en">These are not disclaimers; they are the things that will waste your time.</span>
     </p>
+    <ul class="plain">
+      <li><span lang="zh"><b>一次一个程序，ring 0，没有内存隔离。</b>程序崩了系统就崩。这不是 bug，是当前状态。</span>
+          <span lang="en"><strong>One program at a time, ring 0, no memory isolation.</strong> A crashing program takes the system down. This is not a bug, it is the current state.</span></li>
+      <li><span lang="zh"><b>还没有 <code>ExitBootServices</code>。</b>固件的中断和异常处理还在 —— 所以我们崩了还能看到寄存器转储。</span>
+          <span lang="en"><strong>No <code>ExitBootServices</code> yet.</strong> The firmware's interrupt and exception handling is still in place, which is why a crash still gives us a register dump.</span></li>
+      <li><span lang="zh"><b>中文只能显示，不能输入。</b>光标也还不闪。</span>
+          <span lang="en"><strong>Chinese can be displayed but not typed.</strong> The cursor does not blink yet either.</span></li>
+      <li><span lang="zh"><b>只在 QEMU + OVMF 上验证过。</b>不支持 EFI 的机器启动不了，也没有 CSM 这条路。</span>
+          <span lang="en"><strong>Only ever verified on QEMU + OVMF.</strong> Machines without EFI cannot boot it, and there is no CSM route.</span></li>
+      <li><span lang="zh"><b><code>autoexec.bat</code> 每次开机都在真实 ESP 上写。</b>上真机前请把那几行注释掉。</span>
+          <span lang="en"><strong><code>autoexec.bat</code> writes to the real ESP on every boot.</strong> Comment those lines out before using real hardware.</span></li>
+    </ul>
   </section>
 
   <section>
-    <h2>TNX：为什么不用 PE <span class="dim en">Why not PE</span></h2>
-    <blockquote>
-      在 UEFI 底下，<strong>PE 是免费的</strong> —— <code>LoadImage</code> 是固件替我们写的加载器。
-      所以 TNX 的价值不是「比 PE 简单」，而是：<strong>当我们不能再调 <code>LoadImage</code> 的时候，我们还能加载程序。</strong>
-    </blockquote>
-    <table class="tbl">
-      <thead><tr><th>方案</th><th>成本</th></tr></thead>
-      <tbody>
-        <tr><td>继续用固件 <code>LoadImage</code></td><td>0，代价是永远离不开 UEFI</td></tr>
-        <tr><td>自己写 PE 加载器</td><td>约 800 行，全是边界情况</td></tr>
-        <tr class="good"><td>TNX + tnxpack + 加载器</td><td>规格 + 约 300 行打包器 + 约 250 行加载器</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section>
-    <h2>自己构建 <span class="dim en">Build it yourself</span></h2>
-    <p>需要：Windows + PowerShell、LLVM（clang 与 ld.lld）、QEMU 与 OVMF、以及全部四个仓库。</p>
-    <pre class="code">setx TNDDOS_LLVM_BIN "D:\LLVM\bin"
-setx TNDDOS_QEMU     "D:\qemu\qemu-system-x86_64.exe"
-setx TNDDOS_TOOLKIT  "D:\TNDOS-ToolsKit"
-setx TNDDOS_SDK      "D:\TNDOS-SDK"
-setx TNDDOS_SYSAPP   "D:\TNDOS-SysAPP"
-
-cd TNDOS-SysCore
-.\tools\build-run.ps1</pre>
-    <p class="note">
-      <code>build-run.ps1</code> 一条命令做完：编译 -&gt; 组装 EFI System Partition -&gt;
-      生成真实 FAT16 磁盘映像 -&gt; 无头 QEMU/OVMF 启动 -&gt; 打印串口日志。
-      加 <code>-Seconds N</code> 控制启动时长，<code>-NoRun</code> 只编译。
-    </p>
-  </section>
-
-  <section>
-    <h2>关于这个页面 <span class="dim en">About this page</span></h2>
+    <h2><span lang="zh">从这里开始</span><span lang="en">Start here</span></h2>
     <p>
-      纯静态：没有构建步骤、没有依赖、没有框架。<strong>唯一的真相来源是
-      <code>data/versions.json</code></strong>。
-    </p>
-    <p>
-      页面<strong>不依赖 GitHub API</strong> 来取版本列表 —— 匿名调用
-      <code>api.github.com</code> 是每小时 60 次、按 IP 计，共享出口很容易直接吃 403。
-      一个会因为限流而白屏的下载页是不可接受的。
-      唯一需要联网的是下载链接本身，那走的是不受限流影响的归档地址。
+      <span lang="zh">去 <a href="download.html">下载页</a>拿源码和工具。
+      想动手改的，先读 <a href="https://github.com/TNDOS/TNDOS-SysCore/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+      和 <a href="https://github.com/TNDOS/TNDOS-SysCore/blob/main/docs/ROADMAP.md">路线图</a>。</span>
+      <span lang="en">Head to the <a href="download.html">download page</a> for source and tools.
+      If you want to change something, read
+      <a href="https://github.com/TNDOS/TNDOS-SysCore/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> and the
+      <a href="https://github.com/TNDOS/TNDOS-SysCore/blob/main/docs/ROADMAP.md">roadmap</a> first.</span>
     </p>
   </section>
 
 </main>
-
 <footer>
   <div class="wrap">
-    <p>
-      <a href="https://github.com/TNDOS/TNDOS-SysCore">TNDOS-SysCore</a> ·
-      <a href="https://github.com/TNDOS/TNDOS-SDK">TNDOS-SDK</a> ·
-      <a href="https://github.com/TNDOS/TNDOS-ToolsKit">TNDOS-ToolsKit</a> ·
-      <a href="https://github.com/TNDOS/TNDOS-SysAPP">TNDOS-SysAPP</a>
-    </p>
-    <p class="dim">TNDDOS / 2NDDOS — 保留交互模型，丢掉内存模型。</p>
+    <div>
+      <span lang="zh">TNDDOS / 2NDDOS —— UEFI 时代的 DOS。源码在 <a href="https://github.com/TNDOS">github.com/TNDOS</a>。</span>
+      <span lang="en">TNDDOS / 2NDDOS, a DOS for the UEFI era. Source at <a href="https://github.com/TNDOS">github.com/TNDOS</a>.</span>
+    </div>
+    <div>
+      <a href="https://github.com/TNDOS/TNDOS-SysCore"><span lang="zh">源码</span><span lang="en">Source</span></a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/TNDOS/WebSrv/issues"><span lang="zh">联系我们</span><span lang="en">Contact</span></a>
+    </div>
   </div>
 </footer>
-
 <script src="assets/app.js"></script>
 </body>
 </html>
