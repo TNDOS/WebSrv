@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-01",
+  "generated": "2026-10-24",
   "owner": "TNDOS",
   "site": "github.com/TNDOS/WebSrv",
   "components": [
@@ -8,14 +8,28 @@
       "repo": "TNDOS-SysCore",
       "zh": "内核 / 系统核心",
       "en": "Kernel and SysCore",
-      "desc_zh": "引导链、TNX 加载器、内核、Shell。这是操作系统本体。成品二进制（磁盘映像、内核映像）在每个版本的 Releases 页面上。",
-      "desc_en": "Boot chain, TNX loader, kernel, shell. Built binaries are attached to each release.",
+      "desc_zh": "引导链、TNX 加载器、内核、Shell。这是操作系统本体。成品二进制（VHD）在每个版本的 Releases 页面上。",
+      "desc_en": "Boot chain, TNX loader, kernel, shell. Built binaries (VHD) are attached to each release.",
       "versions": [
+        {
+          "tag": "v0.3.2-M4-SP2.5",
+          "date": "2026-10-24",
+          "sha": "d195255",
+          "latest": true,
+          "subject_zh": "自研 FAT12/16/32 取代 FatFs（跨簇读取会交出错数据，导致程序映像被写坏）；发行改 VHD（动态扩展）；控制台写入原子化",
+          "subject_en": "Own FAT12/16/32 replaces FatFs (the port corrupted images when reading across clusters); releases ship as VHD (dynamically expanding); atomic console updates"
+        },
+        {
+          "tag": "v0.3.2-M4-SP2",
+          "date": "2026-10-10",
+          "sha": "8c2d262",
+          "subject_zh": "TNX 1.1（架构标识）、点阵 ASCII 字体、多盘符挂载",
+          "subject_en": "TNX 1.1 (machine tag), bitmap ASCII font, multiple drive letters"
+        },
         {
           "tag": "v0.3.2-M4-SP1",
           "date": "2026-10-08",
           "sha": "32a1c98",
-          "latest": true,
           "subject_zh": "中文上屏；控制台服务层与自有 framebuffer 后端；API v2.4 批量原语；定时器",
           "subject_en": "Chinese on screen; console service layer with a framebuffer backend; API v2.4 batch primitives; timer"
         },
@@ -66,10 +80,17 @@
       "desc_en": "Headers, runtime, linker script and examples for writing TNX programs and drivers.",
       "versions": [
         {
+          "tag": "v1.1",
+          "date": "2026-10-24",
+          "sha": "4728c2a",
+          "latest": true,
+          "subject_zh": "驱动 SDK（每个驱动独立产物、1 MiB 窗口槽）；constest 控制台压力样例；udtest 异常帧自检样例；FatFs 已移除，文件 API 全走自研 FAT",
+          "subject_en": "Driver SDK (each driver a separate artifact with a 1 MiB window slot); constest console stress sample; udtest trap-frame self-test; FatFs removed, all file APIs now use our own FAT driver"
+        },
+        {
           "tag": "v1.0",
           "date": "2026-09-29",
           "sha": "176f995",
-          "latest": true,
           "subject_zh": "自包含 SDK：API v2.x、printf、文件 / 目录 API、驱动运行时",
           "subject_en": "Self-contained SDK: API v2.x, printf, file/dir API, driver runtime"
         }
@@ -84,10 +105,17 @@
       "desc_en": "Host tools: tnxpack, tnxdump, mkfat.",
       "versions": [
         {
+          "tag": "v1.1",
+          "date": "2026-10-24",
+          "sha": "7177ac7",
+          "latest": true,
+          "subject_zh": "tnxpack / tnxdump 支持 TNX 1.1；tnxdump 的程序基址跟上内核（0x2800000）",
+          "subject_en": "tnxpack / tnxdump understand TNX 1.1; tnxdump follows the kernel's program base (0x2800000)"
+        },
+        {
           "tag": "v1.0",
           "date": "2026-09-29",
           "sha": "a32086f",
-          "latest": true,
           "subject_zh": "tnxpack / tnxdump / mkfat",
           "subject_en": "tnxpack / tnxdump / mkfat"
         }
@@ -102,10 +130,17 @@
       "desc_en": "External commands, each a TNX program.",
       "versions": [
         {
+          "tag": "v1.1",
+          "date": "2026-10-03",
+          "sha": "9ecafd9",
+          "latest": true,
+          "subject_zh": "TREE 画成真树；EDIT 四色分区 + 光标可见 + Insert/覆盖模式",
+          "subject_en": "TREE draws a real tree; EDIT gains four colour zones, a visible cursor and an insert/overwrite mode"
+        },
+        {
           "tag": "v1.0",
           "date": "2026-10-01",
           "sha": "568f81f",
-          "latest": true,
           "subject_zh": "七个外部命令，含 EXECOM 与全屏 EDIT",
           "subject_en": "Seven external commands including EXECOM and a full-screen EDIT"
         }
