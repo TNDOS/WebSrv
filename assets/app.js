@@ -117,14 +117,14 @@
 
   var req;
   try { req = new XMLHttpRequest(); } catch (e) { fail('浏览器不支持 XMLHttpRequest'); return; }
-  /* 加一个时间戳绕过缓存。
+  /* **不加时间戳绕过缓存。**
    *
-   * 不加的话会遇到这种事：仓库里 versions.json 明明已经更新、Pages 也部署完了，
-   * 页面还是显示旧版本 —— 因为浏览器把那个 JSON 缓存住了，而它是 XMLHttpRequest
-   * 取的，硬刷新页面也不会重新取。表现就是「索引没生效」。
+   * 加 ?t= 会让每次访问都重新拉一次清单 —— 而清单几周才变一次，这个代价不值。
+   * 浏览器缓存住反而是对的。
    *
-   * 清单只有几 KB，每次都重新取比让人怀疑数据没更新要好。 */
-  req.open('GET', 'data/versions.json?t=' + Date.now(), true);
+   * 代价是「仓库改了、Pages 也部署了、页面还是旧的」。所以页面上明写一句：
+   * 对不上就 Ctrl+F5。一句提示换掉每次访问的往返，划算。 */
+  req.open('GET', 'data/versions.json', true);
   req.onreadystatechange = function () {
     if (req.readyState !== 4) return;
     if (req.status !== 200 && req.status !== 0) { fail('HTTP ' + req.status); return; }
