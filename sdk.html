@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDK —— TNDDOS</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html">TNDDOS</a>
+    <nav>
+      <a href="index.html"><span lang="zh">主页</span><span lang="en">Home</span></a>
+      <a href="sdk.html"><span lang="zh">SDK</span><span lang="en">SDK</span></a>
+      <a href="download.html"><span lang="zh">下载</span><span lang="en">Download</span></a>
+      <a href="https://github.com/TNDOS/TNDOS-SysCore"><span lang="zh">源码</span><span lang="en">Source</span></a>
+      <a href="https://github.com/TNDOS/WebSrv/issues"><span lang="zh">联系我们</span><span lang="en">Contact</span></a>
+    </nav>
+    <button id="lang" class="lang" type="button">EN</button>
+  </div>
+</header>
+<main class="wrap">
+
+  <section style="margin-top:2.5rem">
+    <h1 style="font-size:1.8rem"><span lang="zh">写一个 TNDDOS 程序</span><span lang="en">Writing a TNDDOS program</span></h1>
+    <p>
+      <span lang="zh">TNX 程序是一个普通的 x86-64 ELF，由 <code>tnxpack</code> 转成 TNX 格式，
+      由内核加载到程序窗口里跑。你要写的东西只有两个：<code>tnx_main()</code> 和调用 API 的代码。</span>
+      <span lang="en">A TNX program is an ordinary x86-64 ELF, converted to TNX by <code>tnxpack</code> and loaded into the
+      program window by the kernel. All you write is <code>tnx_main()</code> plus whatever API calls you need.</span>
+    </p>
+  </section>
+
+  <section>
+    <h2><span lang="zh">最小程序</span><span lang="en">The smallest program</span></h2>
+    <div class="code">#include "tndrt.h"
+
+int tnx_main(void) {
+    tnd_printf("hello from %s\n", "a TNX program");
+    return 0;
+}</div>
+    <p class="note">
+      <span lang="zh"><b>入口是 <code>tnx_main</code>，不带参数，返回 <code>int</code>。</b>
+      真正的入口桩 <code>tnx_entry</code> 在 SDK 的 <code>lib/tndrt.c</code> 里 ——
+      它把加载器传进来的 API 表存好再调你的 <code>tnx_main</code>。
+      所以程序里永远只写 <code>tnd_xxx(...)</code>，不需要知道 API 表从哪来。</span>
+      <span lang="en"><b>The entry point is <code>tnx_main</code>, it takes no arguments and returns <code>int</code>.</b>
+      The real entry stub <code>tnx_entry</code> lives in the SDK at <code>lib/tndrt.c</code>: it stores the API table
+      handed over by the loader and then calls your <code>tnx_main</code>. That is why a program only ever writes
+      <code>tnd_xxx(...)</code> and never needs to know where the table came from.</span>
+    </p>
+  </section>
+
+  <section>
+    <h2><span lang="zh">编译</span><span lang="en">Building it</span></h2>
+    <div class="code">cd repos\TNDOS-SDK
+tools\build-tnx.ps1 -Source examples\hello\hello.c -Out build\HELLO.TNX</div>
+    <p>
+      <span lang="zh">脚本把三段串起来，TNX 不需要自己的编译器：</span>
+      <span lang="en">The script chains three steps; TNX does not need a compiler of its own:</span>
+    </p>
+    <div class="code">clang -&gt; .o -&gt; ld.lld -&gt; .elf -&gt; tnxpack -&gt; .TNX</div>
+    <p>
+      <span lang="zh">编出来的 <code>.TNX</code> 丢到 ESP 的 <code>\EFI\TNDOS\</code> 下，
+      在 shell 里敲名字就能跑（<code>HELLO</code> 会自动找 <code>HELLO.TNX</code>）。</span>
+      <span lang="en">Drop the resulting <code>.TNX</code> into <code>\EFI\TNDOS\</code> on the ESP and type its name in the
+      shell -- <code>HELLO</code> finds <code>HELLO.TNX</code> automatically.</span>
+    </p>
+  </section>
+
+  <section>
+    <h2><span lang="zh">编译参数是硬要求</span><span lang="en">The compile flags are not suggestions</span></h2>
+    <div class="code">-target x86_64-unknown-none   目标三元组：没有操作系统，不链接 libc
+-ffreestanding               freestanding 环境
+-fno-builtin                 不要把 memcpy 之类换成编译器内建
+-fno-stack-protector         没有 __stack_chk_fail 可调
+-mno-red-zone               &lt;- 最重要
+-nostdlib                    不链接标准库</div>
+    <p class="note">
+      <span lang="zh"><b><code>-mno-red-zone</code> 是必加的。</b>程序跑在 ring 0，中断和异常使用同一套栈 ——
+      红区一旦被中断处理程序踩掉，症状是"随机某个局部变量变了"，极难查。</span>
+      <span lang="en"><b><code>-mno-red-zone</code> is mandatory.</b> The program runs in ring 0 and interrupts and exceptions
+      use the same stack. If an interrupt handler clobbers the red zone, the symptom is "a local variable changed
+      at random", which is brutal to debug.</span>
+    </p>
+  </section>
+
+  <section>
+    <h2><span lang="zh">API 一览</span><span lang="en">The API at a glance</span></h2>
+    <p>
+      <span lang="zh">头文件 <code>tndrt.h</code> 里全是扁平函数，没有对象、没有句柄表要自己管。</span>
+      <span lang="en">Everything in <code>tndrt.h</code> is a flat function -- no objects, no handle tables to manage.</span>
+    </p>
+    <div class="code">控制台    tnd_puts / tnd_putc / tnd_putu / tnd_putx / tnd_printf
+环境      tnd_env(name)
+句柄 I/O  tnd_open / tnd_close / tnd_read / tnd_write / tnd_seek
+文件系统  tnd_unlink / tnd_mkdir / tnd_rmdir / tnd_rename / tnd_stat
+目录遍历  tnd_findfirst / tnd_findnext / tnd_findclose
+屏幕键盘  tnd_cls / tnd_gotoxy / tnd_getkey / tnd_cols / tnd_rows / tnd_setattr
+批量原语  tnd_write_cells / tnd_fill / tnd_scroll / tnd_screen
+内存时间  tnd_alloc / tnd_free / tnd_ticks
+便捷函数  tnd_getline / tnd_readfile / tnd_getch
+字符串    tnd_strlen / tnd_strcmp / tnd_stricmp / tnd_memzero / tnd_strncpy</div>
+  </section>
+
+  <section>
+    <h2><span lang="zh">printf 只有一个小抄</span><span lang="en">printf covers a small subset</span></h2>
+    <div class="code">支持    %s %c %d %u %x %X %p %%
+不支持  宽度 / 精度 / 浮点 —— 写 %-28s 或 %6d 会原样打出来
+上限    单次格式化结果 512 字节
+换行    \n 会自动展开成 \r\n</div>
+    <p class="note">
+      <span lang="zh"><b>这条坑实测过</b>：压测程序用了 <code>%-28s</code>，编译通过、运行不报错，
+      屏幕上就是一堆 <code>%-28s</code> 的字面量。要输出原样字节请用 <code>tnd_write()</code>。</span>
+      <span lang="en"><b>This one bit us for real</b>: a test used <code>%-28s</code>, it compiled, nothing complained, and the
+      screen showed the literal characters <code>%-28s</code>. For verbatim bytes use <code>tnd_write()</code>.</span>
+    </p>
+  </section>
+
+  <section>
+    <h2><span lang="zh">写驱动：同一个格式，不同的窗口</span><span lang="en">Drivers: same format, different window</span></h2>
+    <p>
+      <span lang="zh">驱动也是 TNX 程序，也从这个入口进 —— 区别只有两点：<b>链接基址</b>和<b>登记自己</b>。</span>
+      <span lang="en">A driver is also a TNX program and enters through the same point. Only two things differ: <b>the link
+      base</b> and <b>registering itself</b>.</span>
+    </p>
+    <div class="code">tools\build-tnx.ps1 -Source drivers\nvme\nvme.c -Out build\NVME.TNX -ImageBase 0x2000000</div>
+    <div class="code">程序窗口   0x1000000   一次一个程序
+驱动窗口   0x2000000   8 个槽，每个 1 MiB，同一槽重复加载会被拒绝
+程序窗口   0x2800000   实际加载基址（见 tnd.h 的 TNX_PROG_BASE）</div>
+    <p class="note">
+      <span lang="zh">驱动登记完就<b>留着不走</b>，它的窗口会常驻 —— 程序加载时只清自己的窗口，碰不到驱动。
+      这就是多窗口的全部意义。语义和 <code>DEVICE=</code> 约定见 <code>docs/DRIVERS.md</code>。</span>
+      <span lang="en">After registering, a driver <b>stays resident</b> -- its window persists. Loading a program only clears the
+      program window, so it cannot touch a driver. That is the whole point of having several windows. See
+      <code>docs/DRIVERS.md</code> for the <code>DEVICE=</code> conventions.</span>
+    </p>
+  </section>
+
+  <section>
+    <h2><span lang="zh">常见坑</span><span lang="en">Traps worth knowing</span></h2>
+    <div class="code">没有 libc       memcpy / strlen 要自己带，或用 tnd_ 系列
+没有内存保护   程序崩了系统就崩，运行在 ring 0
+8.3 短名       文件系统只解析 8.3，长文件名项跳过
+一次一个程序   没有多进程，没有隔离
+API 版本       用 tnd_api()-&gt;Version 判断能力，别假设</div>
+  </section>
+
+  <section>
+    <h2><span lang="zh">从这里下手</span><span lang="en">Where to start</span></h2>
+    <p>
+      <span lang="zh">SDK 仓库里的 <code>examples/</code> 就是最好的文档 —— <code>hello</code> 覆盖了几乎所有 API，
+      <code>stress</code> 是掺了三个真实开源库（MD5 / AES / inflate）的重负载样例。</span>
+      <span lang="en">The <code>examples/</code> directory in the SDK is the best documentation: <code>hello</code> exercises almost the
+      whole API, and <code>stress</code> is a heavier sample that links three real open-source libraries
+      (MD5 / AES / inflate).</span>
+    </p>
+    <p>
+      <span lang="zh">完整的 API 表结构与版本协商见
+      <a href="https://github.com/TNDOS/TNDOS-SysCore/blob/main/docs/TNX-SPEC.md">TNX 规范</a>，
+      驱动模型的语义见
+      <a href="https://github.com/TNDOS/TNDOS-SysCore/blob/main/docs/DRIVERS.md">docs/DRIVERS.md</a>。</span>
+      <span lang="en">The full API table layout and version negotiation are in the
+      <a href="https://github.com/TNDOS/TNDOS-SysCore/blob/main/docs/TNX-SPEC.md">TNX specification</a>; the driver
+      model is described in
+      <a href="https://github.com/TNDOS/TNDOS-SysCore/blob/main/docs/DRIVERS.md">docs/DRIVERS.md</a>.</span>
+    </p>
+  </section>
+
+</main>
+<footer>
+  <div class="wrap">
+    <div>
+      <span lang="zh">TNDDOS / 2NDDOS —— UEFI 时代的 DOS。源码在 <a href="https://github.com/TNDOS">github.com/TNDOS</a>。</span>
+      <span lang="en">TNDDOS / 2NDDOS, a DOS for the UEFI era. Source at <a href="https://github.com/TNDOS">github.com/TNDOS</a>.</span>
+    </div>
+    <div>
+      <a href="https://github.com/TNDOS/TNDOS-SysCore"><span lang="zh">源码</span><span lang="en">Source</span></a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/TNDOS/WebSrv/issues"><span lang="zh">联系我们</span><span lang="en">Contact</span></a>
+    </div>
+  </div>
+</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>
